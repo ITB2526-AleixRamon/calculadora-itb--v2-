@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora (v2) - Fase 3</title>
+    <link rel="stylesheet" href="css/stylev2.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="terminal">
+        <h1>>_ CALCULADORAv2 - FASE 3</h1>
+        <p>> INTRODUEIX CONSUM BASE MENSUAL:</p>
+        
+        <div class="inputs">
+            <label>Electricitat (kWh): <input type="number" id="elec" value="1000"></label>
+            <label>Aigua (Litres): <input type="number" id="aigua" value="5000"></label>
+            <label>Material Oficina (€): <input type="number" id="oficina" value="200"></label>
+            <label>Neteja (€): <input type="number" id="neteja" value="300"></label>
+        </div>
+
+        <div class="botons-container">
+            <button onclick="calcular()">Executar Diagnòstic</button>
+            <button onclick="aplicarMillores()">Aplicar Reducció ASG -30%</button>
+        </div>
+
+        <div id="resultats" class="hidden">
+            <h2>>_ DIAGNÒSTIC ASG GENERAT:</h2>
+            <div class="dashboard-grid">
+                <div class="chart-container">
+                    <canvas id="recursosChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="economicChart"></canvas>
+                </div>
+            </div>
+            <div id="output-resum"></div>
+        </div>
+
+        <div class="pla-reduccio">
+            <h3>> PLA DE REDUCCIÓ 30% (3 ANYS):</h3>
+            <p>- Aigua: Reparació fuita nocturna (193 L/h) i polsadors temporitzats.</p>
+            <p>- Energia: Apagat automàtic servidors CPDs i Green Coding.</p>
+            <p>- Materials: Política 'Zero Paper' i economia circular (recondicionament RAEE).</p>
+        </div>
+        <div class="credits">
+            >_ © Erik P. | Steven R. | Aleix R. - ITB
+        </div>
+    </div>
+    
+    <script src="js/calculadorav2.js"></script>
+</body>
+</html>

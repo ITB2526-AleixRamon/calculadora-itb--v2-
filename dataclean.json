@@ -1,0 +1,152 @@
+{
+  "centre": "Institut Tecnològic de Barcelona",
+  "fase": "1 - Diagnosi ASG",
+  "data_exportacio": "2026-03-23",
+  "indicadors_prioritzats": [
+    {
+      "id": "IND-01",
+      "nom": "Taxa de Pèrdua Hídrica Estructural",
+      "dimensio": "Ambiental",
+      "ods_relacionat": 6,
+      "formula": "Mitjana de litres consumits per hora fora de l'horari d'obertura (21:30 - 07:30)"
+    },
+    {
+      "id": "IND-02",
+      "nom": "Percentatge d'Autoconsum Tecnològic",
+      "dimensio": "Ambiental",
+      "ods_relacionat": 7,
+      "formula": "(Energia solar generada / Energia total consumida) * 100"
+    },
+    {
+      "id": "IND-03",
+      "nom": "Índex de Conflictivitat Digital a l'Aula",
+      "dimensio": "Social",
+      "ods_relacionat": 3,
+      "formula": "Nombre d'incidències per ús de mòbil / Nombre total d'alumnes"
+    },
+    {
+      "id": "IND-04",
+      "nom": "Despesa en Materials d'Un Sol Ús",
+      "dimensio": "Governança / Ambiental",
+      "ods_relacionat": 12,
+      "formula": "Suma de l'import net en euros de consumibles no duradors mensuals"
+    }
+  ],
+  "dades_recollides": {
+    "consum_aigua_anomal": [
+      {
+        "data": "2024-02-25",
+        "hora": "03:00",
+        "litres_consumits": 193,
+        "observacions": "Fora d'horari"
+      },
+      {
+        "data": "2024-02-28",
+        "hora": "01:00",
+        "litres_consumits": 154,
+        "observacions": "Fora d'horari"
+      },
+      {
+        "data": "2024-02-29",
+        "hora": "00:00",
+        "litres_consumits": 175,
+        "observacions": "Fora d'horari"
+      }
+    ],
+    "factures_compres_i_manteniment": [
+      {
+        "id_document": "F035-MaterialOficina",
+        "data": "2024-04-30",
+        "proveidor": "Lyreco",
+        "categoria": "Material Oficina",
+        "descripcio_principal": "Paper A4 (15 unitats) i recanvis pissarra",
+        "import_net_eur": 229.03,
+        "import_total_eur": 277.13
+      },
+      {
+        "id_document": "F036-Lyreco",
+        "data": "2024-05-31",
+        "proveidor": "Lyreco",
+        "categoria": "Material Oficina",
+        "descripcio_principal": "Paper A4 (30 unitats) i recanvis",
+        "import_net_eur": 215.90,
+        "import_total_eur": 261.24
+      },
+      {
+        "id_document": "Desclasificat",
+        "data": "2024-06-19",
+        "proveidor": "Desconegut",
+        "categoria": "Material Oficina",
+        "descripcio_principal": "Recanvi marcador pissarra blanca (40 unitats)",
+        "import_net_eur": 28.40,
+        "import_total_eur": 34.36
+      },
+      {
+        "id_document": "F046-NP",
+        "data": "2024-05-23",
+        "proveidor": "Independent",
+        "categoria": "Manteniment Elèctric",
+        "descripcio_principal": "Eliminar circuits obsolets i nou quadre",
+        "import_net_eur": 2105.80,
+        "import_total_eur": 2548.02
+      },
+      {
+        "id_document": "F041-NP",
+        "data": "2024-07-05",
+        "proveidor": "Independent",
+        "categoria": "Climatització",
+        "descripcio_principal": "Reparació urgència AACC i neteja filtres",
+        "import_net_eur": 288.00,
+        "import_total_eur": 348.48
+      },
+      {
+        "id_document": "F039-NP",
+        "data": "2024-09-13",
+        "proveidor": "Independent",
+        "categoria": "Infraestructura",
+        "descripcio_principal": "Treballs en ferro i fusta, baranes",
+        "import_net_eur": 837.17,
+        "import_total_eur": 1012.98
+      },
+      {
+        "id_document": "F055-Neteges",
+        "data": "2024-06-20",
+        "proveidor": "Empresa de Neteges",
+        "categoria": "Neteja i Consumibles",
+        "descripcio_principal": "Fardos paper secamans, bosses escombraries",
+        "import_net_eur": 620.05,
+        "import_total_eur": 750.26
+      }
+    ],
+    "telecomunicacions_i_xarxa": [
+      {
+        "id_document": "F078-DIGI-MAIG",
+        "proveidor": "Digi",
+        "mes": "Maig 2024",
+        "estat": "Pendent d'extreure import exacte"
+      },
+      {
+        "id_document": "F294-O2-Març",
+        "proveidor": "O2",
+        "mes": "Març 2024",
+        "estat": "Pendent d'extreure import exacte"
+      }
+    ],
+    "planta_solar_fotovoltaica": {
+      "font_dades": "Plant Report_ITB_01-2025.xlsx - Sheet1.csv",
+      "registres_diaris": [
+        {
+          "data": "YYYY-MM-DD",
+          "generacio_kWh": 0.0,
+          "consum_xarxa_kWh": 0.0
+        }
+      ]
+    },
+    "impacte_social_tecnologia": {
+      "font_dades": "INDICADORS Mobils a l_aula 2024-2025.pdf",
+      "curs": "2024-2025",
+      "incidencies_registrades": 0,
+      "dispositius_confiscats": 0
+    }
+  }
+}
