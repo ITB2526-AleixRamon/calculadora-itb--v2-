@@ -18,24 +18,33 @@
             <label>Material Oficina (€): <input type="number" id="oficina" value="200"></label>
             <label>Neteja (€): <input type="number" id="neteja" value="300"></label>
         </div>
-
+            <div id="estacionalitat-info" class="estacionalitat-tag"></div>
+            <div class="dashboard-grid">
+        </div>
+        <div class="seasonal-controls">
+            <p>> SELECCIONA PERÍODE DE DIAGNOSI:</p>
+            <div class="selector-group">
+                <button class="btn-estacio active" onclick="setEstacio('Anual', this)">🗓️ ANUAL</button>
+                <button class="btn-estacio" onclick="setEstacio('Primavera', this)">🌸 PRIMAVERA</button>
+                <button class="btn-estacio" onclick="setEstacio('Estiu', this)">☀️ ESTIU</button>
+                <button class="btn-estacio" onclick="setEstacio('Tardor', this)">🍁 TARDOR</button>
+                <button class="btn-estacio" onclick="setEstacio('Hivern', this)">❄️ HIVERN</button>
+            </div>
+        </div>
         <div class="botons-container">
             <button onclick="calcular()">Executar Diagnòstic</button>
             <button onclick="aplicarMillores()">Aplicar Reducció ASG -30%</button>
         </div>
 
-        <div id="resultats" class="hidden">
-            <h2>>_ DIAGNÒSTIC ASG GENERAT:</h2>
-            <div class="dashboard-grid">
-                <div class="chart-container">
-                    <canvas id="recursosChart"></canvas>
-                </div>
-                <div class="chart-container">
-                    <canvas id="economicChart"></canvas>
-                </div>
-            </div>
-            <div id="output-resum"></div>
+    <div id="resultats" class="hidden">
+        <h2>>_ DIAGNÒSTIC ASG GENERAT:</h2>
+        <div class="dashboard-grid">
+            <div class="chart-container"><canvas id="recursosChart"></canvas></div>
+            <div class="chart-container"><canvas id="economicChart"></canvas></div>
         </div>
+        <div id="output-resum"></div>
+        <div id="estalvi-real-container"></div> 
+    </div>
 
         <div class="pla-reduccio">
             <h3>> PLA DE REDUCCIÓ 30% (3 ANYS):</h3>

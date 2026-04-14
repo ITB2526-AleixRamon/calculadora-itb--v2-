@@ -99,9 +99,44 @@ input:focus {
 }
 
 /* --- BOTONS --- */
+.seasonal-controls {
+    margin: 20px 0;
+    text-align: left;
+}
+
+.selector-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.btn-estacio {
+    background: rgba(0, 255, 102, 0.05);
+    border: 1px solid var(--glass-border);
+    color: var(--eco-soft);
+    padding: 8px 15px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.btn-estacio:hover {
+    background: rgba(0, 255, 102, 0.2);
+    border-color: var(--eco-primary);
+}
+
+.btn-estacio.active {
+    background: var(--eco-primary);
+    color: #000;
+    box-shadow: 0 0 15px var(--eco-primary);
+    font-weight: bold;
+}
+
 .botons-container {
   display: flex;
-  justify-content: center;
+  justify-content: left;
   gap: 15px;
   margin-bottom: 30px;
 }
