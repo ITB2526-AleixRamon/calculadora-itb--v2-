@@ -138,6 +138,7 @@ function renderitzarUI(tAny, tPeriode, f) {
         logInfo.innerHTML = `<b>[SISTEMA] Mode ${estacioActual} Actiu</b> | <small>${reduccioActiva ? '🟢 POLÍTIQUES ASG APLICADES' : '🔴 SENSE OPTIMITZAR'}</small>`;
     }
 
+    // 1. RESUM 8 CÀLCULS
     document.getElementById('output-resum').innerHTML = `
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; text-align: left; font-size: 0.85rem;">
             <p>> Elec. Total Any: <b>${(tAny.elec * f).toFixed(0)} kWh</b></p>
@@ -153,14 +154,16 @@ function renderitzarUI(tAny, tPeriode, f) {
 
     const estalviCont = document.getElementById('estalvi-real-container');
     const anticCronograma = document.getElementById('cronograma-container');
-    if(anticCronograma) anticCronograma.innerHTML = "";
+    if(anticCronograma) anticCronograma.innerHTML = ""; // Neteja per si de cas
 
     if (reduccioActiva) {
+        // Càlculs Totals a 3 Anys del període
         const estalviAigua = tPeriode.aigua * 0.3 * 3;
         const estalviElec = tPeriode.elec * 0.3 * 3;
         const estalviCO2 = (tPeriode.elec * 0.25) * 0.3 * 3;
         const estalviEcon = (tPeriode.ofi + tPeriode.neteja) * 0.3 * 3;
 
+        // Analogies Quotidianes
         const banyeres = Math.round(estalviAigua / 150) || 0; 
         const llars = Math.round(estalviElec / 250) || 0; 
         const arbres = Math.round(estalviCO2 / 25) || 0; 
@@ -169,31 +172,29 @@ function renderitzarUI(tAny, tPeriode, f) {
         if (estalviCont) {
             estalviCont.innerHTML = `
                 <div class="pla-reduccio" style="margin-top:20px; border-left: 4px solid var(--eco-primary);">
-                    <h3 style="color:var(--eco-primary);">>_ PLA D'ACCIÓ I IMPACTE (3 ANYS) - ${etiquetaPeriode.toUpperCase()}:</h3>
-                    <p style="font-size:0.75rem; color:var(--eco-soft); margin-bottom: 15px; opacity:0.8;">> Fes clic a cada indicador per veure l'estratègia i la projecció:</p>
+                    <h3 style="color:var(--eco-primary);">>_ PLA ASG - IMPACTE A 3 ANYS (${etiquetaPeriode.toUpperCase()}):</h3>
+                    <p style="font-size:0.75rem; color:var(--eco-soft); margin-bottom: 15px; opacity:0.8;">> Fes clic als indicadors per veure les mesures correctives i l'evolució:</p>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                         
                         <details class="analogy-details">
-                            <summary><span>♻️ Aigua Estalviada: <b style="color:white">${estalviAigua.toLocaleString(undefined, {maximumFractionDigits:0})} L</b></span></summary>
+                            <summary><span>💧 Aigua Evitada: <b style="color:white">${estalviAigua.toLocaleString(undefined, {maximumFractionDigits:0})} L</b></span></summary>
                             <div class="analogy-content">
-                                <p style="margin-bottom:10px;">↳ Això equival a omplir <b>${banyeres.toLocaleString()} banyeres</b>.</p>
+                                <p style="margin-bottom:10px; color: #fff;">↳ Això equival a omplir <b>${banyeres.toLocaleString()} banyeres</b> fins dalt.</p>
                                 <div class="mini-cronograma">
-                                    <p><b>Any 1:</b> Reparació fuites estructurals (193 L/h).</p>
-                                    <p><b>Any 2:</b> Polsadors temporitzats a lavabos.</p>
-                                    <p><b>Any 3:</b> Dipòsit de recollida pluvial per reg.</p>
+                                    <p><b>Mesura 1:</b> Reparació immediata de fuites estructurals (com els 193 L/h detectats).</p>
+                                    <p><b>Mesura 2:</b> Instal·lació de polsadors temporitzats a tots els lavabos del centre.</p>
                                 </div>
                                 <div style="height: 120px; width: 100%; margin-top:10px;"><canvas id="chartAigua"></canvas></div>
                             </div>
                         </details>
 
                         <details class="analogy-details">
-                            <summary><span>⚡ Energia Estalviada: <b style="color:white">${estalviElec.toLocaleString(undefined, {maximumFractionDigits:0})} kWh</b></span></summary>
+                            <summary><span>⚡ Energia Evitada: <b style="color:white">${estalviElec.toLocaleString(undefined, {maximumFractionDigits:0})} kWh</b></span></summary>
                             <div class="analogy-content">
-                                <p style="margin-bottom:10px;">↳ Mantindria il·luminades <b>${llars.toLocaleString()} llars</b> un mes.</p>
+                                <p style="margin-bottom:10px; color: #fff;">↳ Mantindria il·luminades <b>${llars.toLocaleString()} llars</b> durant tot un mes.</p>
                                 <div class="mini-cronograma">
-                                    <p><b>Any 1:</b> Apagat de servidors nocturn.</p>
-                                    <p><b>Any 2:</b> Substitució LED i sensors presència.</p>
-                                    <p><b>Any 3:</b> Nou quadre elèctric (estalvi fugues).</p>
+                                    <p><b>Mesura 1:</b> Apagat automàtic de servidors no crítics fora d'horari (Green Coding).</p>
+                                    <p><b>Mesura 2:</b> Bloqueig intel·ligent de termòstats (21°C a l'hivern / 26°C a l'estiu).</p>
                                 </div>
                                 <div style="height: 120px; width: 100%; margin-top:10px;"><canvas id="chartElec"></canvas></div>
                             </div>
@@ -202,24 +203,22 @@ function renderitzarUI(tAny, tPeriode, f) {
                         <details class="analogy-details">
                             <summary><span>🌍 CO2 Evitat: <b style="color:white">${estalviCO2.toLocaleString(undefined, {maximumFractionDigits:1})} kg</b></span></summary>
                             <div class="analogy-content">
-                                <p style="margin-bottom:10px;">↳ Feina d'absorció de <b>${arbres.toLocaleString()} arbres</b>/any.</p>
+                                <p style="margin-bottom:10px; color: #fff;">↳ És la feina d'absorció que farien <b>${arbres.toLocaleString()} arbres</b> en un any.</p>
                                 <div class="mini-cronograma">
-                                    <p><b>Any 1:</b> Conscienciació: Transport públic ITB.</p>
-                                    <p><b>Any 2:</b> Política compres km0 (Lyreco).</p>
-                                    <p><b>Any 3:</b> 20% energia d'Autoconsum Solar.</p>
+                                    <p><b>Mesura 1:</b> Ampliació de la planta fotovoltaica per potenciar l'Autoconsum Solar.</p>
+                                    <p><b>Mesura 2:</b> Incentius al transport públic i a proveïdors de KM0 amb flota elèctrica.</p>
                                 </div>
                                 <div style="height: 120px; width: 100%; margin-top:10px;"><canvas id="chartCO2"></canvas></div>
                             </div>
                         </details>
 
                         <details class="analogy-details">
-                            <summary><span>💶 Estalvi Mat/Net: <b style="color:white">${estalviEcon.toLocaleString(undefined, {maximumFractionDigits:0})} €</b></span></summary>
+                            <summary><span>📦 Estalvi Materials: <b style="color:white">${estalviEcon.toLocaleString(undefined, {maximumFractionDigits:0})} €</b></span></summary>
                             <div class="analogy-content">
-                                <p style="margin-bottom:10px;">↳ Finançaria <b>${portatils} portàtils</b> nous.</p>
+                                <p style="margin-bottom:10px; color: #fff;">↳ Amb això es podrien finançar <b>${portatils} portàtils</b> nous per les aules.</p>
                                 <div class="mini-cronograma">
-                                    <p><b>Any 1:</b> Digitalització tràmits ('Zero Paper').</p>
-                                    <p><b>Any 2:</b> Compra neteja granel (envasos retorn).</p>
-                                    <p><b>Any 3:</b> Taller reparació RAEE (Economia Circular).</p>
+                                    <p><b>Mesura 1:</b> Digitalització d'expedients i avaluacions (Política estricta 'Zero Paper').</p>
+                                    <p><b>Mesura 2:</b> Recondicionament d'equips informàtics per allargar-ne la vida útil (RAEE).</p>
                                 </div>
                                 <div style="height: 120px; width: 100%; margin-top:10px;"><canvas id="chartEcon"></canvas></div>
                             </div>
@@ -229,6 +228,7 @@ function renderitzarUI(tAny, tPeriode, f) {
                 </div>
             `;
             
+            // Generem els gràfics 
             setTimeout(() => {
                 generarMiniGrafic('chartAigua', tPeriode.aigua, tPeriode.aigua * 0.7);
                 generarMiniGrafic('chartElec', tPeriode.elec, tPeriode.elec * 0.7);
@@ -236,6 +236,7 @@ function renderitzarUI(tAny, tPeriode, f) {
                 generarMiniGrafic('chartEcon', tPeriode.ofi + tPeriode.neteja, (tPeriode.ofi + tPeriode.neteja) * 0.7);
             }, 100);
         }
+
     } else {
         if (estalviCont) estalviCont.innerHTML = "";
     }
