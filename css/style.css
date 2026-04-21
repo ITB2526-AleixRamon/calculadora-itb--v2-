@@ -359,3 +359,19 @@ button:hover {
     color: var(--eco-soft);
     line-height: 1.4;
 }
+
+.mini-cronograma {
+    background: rgba(0,0,0,0.4);
+    padding: 8px;
+    border-radius: 4px;
+    border-left: 2px solid var(--eco-secondary);
+    margin-top: 10px;
+    font-size: 0.75rem;
+    color: var(--eco-soft);
+}
+.mini-cronograma p {
+    margin: 3px 0;
+}
+.mini-cronograma b {
+    color: #fff;
+}
