@@ -23,16 +23,31 @@
         </div>
         <div class="seasonal-controls">
             <p>> SELECCIONA PERÍODE DE DIAGNOSI:</p>
-            <div class="selector-group">
-                <button class="btn-estacio active" onclick="setEstacio('Anual', this)">🗓️ ANUAL</button>
-                <button class="btn-estacio" onclick="setEstacio('Primavera', this)">🌸 PRIMAVERA</button>
-                <button class="btn-estacio" onclick="setEstacio('Estiu', this)">☀️ ESTIU</button>
-                <button class="btn-estacio" onclick="setEstacio('Tardor', this)">🍁 TARDOR</button>
-                <button class="btn-estacio" onclick="setEstacio('Hivern', this)">❄️ HIVERN</button>
-            </div>
+           <div class="selector-group">
+            <button class="btn-estacio active" onclick="setEstacio('Anual', this)">
+                🗓️ ANUAL
+                <span class="btn-desc">Cicle complet (pics i tancaments)</span>
+            </button>
+            <button class="btn-estacio" onclick="setEstacio('Primavera', this)">
+                🌸 PRIMAVERA
+                <span class="btn-desc">Inclou tancament per Setmana Santa</span>
+            </button>
+            <button class="btn-estacio" onclick="setEstacio('Estiu', this)">
+                ☀️ ESTIU
+                <span class="btn-desc">Pic hídric i tancament a l'agost</span>
+            </button>
+            <button class="btn-estacio" onclick="setEstacio('Tardor', this)">
+                🍁 TARDOR
+                <span class="btn-desc">Inici de curs (pic en materials)</span>
+            </button>
+            <button class="btn-estacio" onclick="setEstacio('Hivern', this)">
+                ❄️ HIVERN
+                <span class="btn-desc">Pic calefacció i tancament Nadal</span>
+            </button>
+        </div>
         </div>
         <div class="botons-container">
-            <button onclick="calcular()">Executar Diagnòstic</button>
+            <button onclick="executarDiagnostic()">Executar Diagnòstic</button>
             <button onclick="aplicarMillores()">Aplicar Reducció ASG -30%</button>
         </div>
 
@@ -46,12 +61,8 @@
         <div id="estalvi-real-container"></div> 
     </div>
 
-        <div class="pla-reduccio">
-            <h3>> PLA DE REDUCCIÓ 30% (3 ANYS):</h3>
-            <p>- Aigua: Reparació fuita nocturna (193 L/h) i polsadors temporitzats.</p>
-            <p>- Energia: Apagat automàtic servidors CPDs i Green Coding.</p>
-            <p>- Materials: Política 'Zero Paper' i economia circular (recondicionament RAEE).</p>
-        </div>
+        <div id="cronograma-container"></div>
+        
         <div class="credits">
             >_ © Erik P. | Steven R. | Aleix R. - ITB
         </div>

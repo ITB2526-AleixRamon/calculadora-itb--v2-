@@ -72,6 +72,18 @@ function setEstacio(nomEstacio, btn) {
 // =========================================================
 // 3. MOTOR DE CÀLCUL (8 INDICADORS + TENDÈNCIES) 
 // =========================================================
+const MESOS_ANY = ['Set', 'Oct', 'Nov', 'Des', 'Gen', 'Feb', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago'];
+
+function executarDiagnostic() {
+    reduccioActiva = false; // Reseteja la reducció al 0%
+    calcular();
+}
+
+function aplicarMillores() {
+    reduccioActiva = true; // Aplica el -30%
+    calcular();
+}
+
 function calcular() {
     const base = {
         elec: parseFloat(document.getElementById('elec').value) || 0,
@@ -81,83 +93,156 @@ function calcular() {
     };
 
     const factor = reduccioActiva ? 0.7 : 1.0; 
-    const mesosAFiltrar = CONFIG_ESTACIONS[estacioActual];
-    
-    let t = { elec: 0, aigua: 0, ofi: 0, neteja: 0, elecL: 0, aiguaL: 0, ofiL: 0, netejaL: 0 };
+    const mesosSeleccionats = CONFIG_ESTACIONS[estacioActual]; 
 
-    mesosAFiltrar.forEach(mes => {
+    // tAny: Sumatori dels 12 mesos reals
+    let tAny = { elec: 0, aigua: 0, ofi: 0, neteja: 0, co2: 0, estalviCPD: 0 };
+    // tPeriode: Sumatori exclusiu del període seleccionat (o Set-Jun si és Anual)
+    let tPeriode = { elec: 0, aigua: 0, ofi: 0, neteja: 0 };
+
+    // Calculem SEMPRE els 12 mesos per tenir l'Anual correcte
+    MESOS_ANY.forEach((mes, index) => {
         let m = { e: 1.0, a: 1.0, o: 1.0, n: 1.0 };
-        const variabilitat = 1 + (Math.random() * 0.06 - 0.03); // Variabilitat mensual (+/- 3%)
+        
+        // VARIABILITAT DETERMINISTA: Oscil·lació del +/- 4% basada en l'índex del mes.
+        // Així complim amb afegir variabilitat, però els números mai "salten" aleatòriament.
+        const variabilitat = 1 + (Math.sin(index * 12.5) * 0.04); 
 
-        // Aplicació de Cicles Estacionals i Tendències
-        if (['Des', 'Gen', 'Feb'].includes(mes)) m.e = 1.45; // Hivern: Calefacció
-        if (['Mai', 'Jun', 'Jul'].includes(mes)) { m.a = 1.35; m.e = 1.25; } // Estiu: Aigua/AACC
-        if (['Set', 'Jun'].includes(mes)) { m.o = 1.6; m.n = 1.4; } // Pics activitat escolar
-        if (mes === 'Ago') { m.e = 0.15; m.a = 0.1; m.o = 0.0; m.n = 0.25; } // Tancat
+        // LÓGICA DE TANCAMENTS I PICS
+        if (['Des', 'Gen'].includes(mes)) { m.e = 1.25; m.a = 0.6; m.o = 0.5; }
+        if (['Feb'].includes(mes)) { m.e = 1.45; } 
+        if (['Abr'].includes(mes)) { m.e = 0.8; m.a = 0.7; } 
+        if (['Mai', 'Jun', 'Jul'].includes(mes)) { m.a = 1.35; m.e = 1.25; } 
+        if (['Set', 'Jun'].includes(mes)) { m.o = 1.6; m.n = 1.4; } 
+        if (mes === 'Ago') { m.e = 0.1; m.a = 0.05; m.o = 0.0; m.n = 0.1; }
 
         const cE = base.elec * m.e * variabilitat;
         const cA = base.aigua * m.a * variabilitat;
         const cO = base.ofi * m.o * variabilitat;
         const cN = base.neteja * m.n * variabilitat;
 
-        t.elec += cE; t.aigua += cA; t.ofi += cO; t.neteja += cN;
+        // Sumatori Anual (Tot l'any)
+        tAny.elec += cE; tAny.aigua += cA; tAny.ofi += cO; tAny.neteja += cN;
+        tAny.co2 += (cE * 0.25);
+        tAny.estalviCPD += (cE * 0.12);
 
-        // Càlculs Període Lectiu (Setembre a Juny) per a la rúbrica [cite: 5]
-        if (mes !== 'Jul' && mes !== 'Ago') {
-            t.elecL += cE; t.aiguaL += cA; t.ofiL += cO; t.netejaL += cN;
+        // Sumatori Període. Si estem a "Anual", el període és el Lectiu (Sense Jul/Ago).
+        // Si estem en una estació, el període són només els mesos d'aquella estació.
+        const isMesEnPeriode = estacioActual === 'Anual' 
+            ? (mes !== 'Jul' && mes !== 'Ago') 
+            : mesosSeleccionats.includes(mes);
+
+        if (isMesEnPeriode) {
+            tPeriode.elec += cE; tPeriode.aigua += cA; tPeriode.ofi += cO; tPeriode.neteja += cN;
         }
     });
 
-    renderitzarUI(t, factor);
+    renderitzarUI(tAny, tPeriode, factor);
 }
 
 // =========================================================
 // 4. RENDERITZAT I GRÀFICS
 // =========================================================
-function renderitzarUI(t, f) {
+function renderitzarUI(tAny, tPeriode, f) {
     document.getElementById('resultats').classList.remove('hidden');
 
-    // Missatge de Log Estacional (Feedback visual de tendències)
+    // Etiqueta per saber quin període estem visualitzant
+    const etiquetaPeriode = estacioActual === 'Anual' ? 'Lectiu (Set-Jun)' : `Estació (${estacioActual})`;
+
     const logInfo = document.getElementById('estacionalitat-info');
     if (logInfo) {
-        logInfo.innerHTML = `
-            <b>[LOG] Simulació ${estacioActual} Activa</b><br>
-            <small>> Aplicant tendències: ${estacioActual === 'Hivern' ? 'Pic Calefacció' : estacioActual === 'Estiu' ? 'Pic Hídric/AACC' : 'Consums Estàndard'}</small>
-        `;
+        logInfo.innerHTML = `<b>[SISTEMA] Mode ${estacioActual} Actiu</b> | <small>${reduccioActiva ? '🟢 POLÍTIQUES ASG APLICADES' : '🔴 SENSE OPTIMITZAR'}</small>`;
     }
 
-    // Els 8 Càlculs Requerits (Fase 3 - 3.1a) 
+    // 1. ELS 8 CÀLCULS REQUERITS (RESUM)
     document.getElementById('output-resum').innerHTML = `
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; text-align: left; font-size: 0.85rem;">
-            <p>> Elec. Any: <b>${(t.elec * f).toFixed(0)} kWh</b></p>
-            <p>> Elec. Lectiu: <b>${(t.elecL * f).toFixed(0)} kWh</b></p>
-            <p>> Aigua Any: <b>${(t.aigua * f).toFixed(0)} L</b></p>
-            <p>> Aigua Lectiu: <b>${(t.aiguaL * f).toFixed(0)} L</b></p>
-            <p>> Oficina Any: <b>${(t.ofi * f).toFixed(2)} €</b></p>
-            <p>> Oficina Lectiu: <b>${(t.ofiL * f).toFixed(2)} €</b></p>
-            <p>> Neteja Any: <b>${(t.neteja * f).toFixed(2)} €</b></p>
-            <p>> Neteja Lectiu: <b>${(t.netejaL * f).toFixed(2)} €</b></p>
+            <p>> Elec. Total Any: <b>${(tAny.elec * f).toFixed(0)} kWh</b></p>
+            <p>> Elec. ${etiquetaPeriode}: <b>${(tPeriode.elec * f).toFixed(0)} kWh</b></p>
+            <p>> Aigua Total Any: <b>${(tAny.aigua * f).toFixed(0)} L</b></p>
+            <p>> Aigua ${etiquetaPeriode}: <b>${(tPeriode.aigua * f).toFixed(0)} L</b></p>
+            <p>> Oficina Total Any: <b>${(tAny.ofi * f).toFixed(2)} €</b></p>
+            <p>> Oficina ${etiquetaPeriode}: <b>${(tPeriode.ofi * f).toFixed(2)} €</b></p>
+            <p>> Neteja Total Any: <b>${(tAny.neteja * f).toFixed(2)} €</b></p>
+            <p>> Neteja ${etiquetaPeriode}: <b>${(tPeriode.neteja * f).toFixed(2)} €</b></p>
         </div>
     `;
 
-    // Estalvi Real (Rúbrica: Pla 3 anys)
     const estalviCont = document.getElementById('estalvi-real-container');
-    if (reduccioActiva && estalviCont) {
-        estalviCont.innerHTML = `
-            <div class="pla-reduccio" style="margin-top:20px; border-left: 4px solid var(--eco-primary);">
-                <h3 style="color:var(--eco-primary);">>_ ESTALVI REAL PROJECTAT (3 ANYS):</h3>
-                <p>♻️ Aigua: <b>${(t.aigua * 0.3 * 3).toLocaleString()} L</b></p>
-                <p>⚡ Energia: <b>${(t.elec * 0.3 * 3).toLocaleString()} kWh</b></p>
-            </div>
-        `;
+    const cronogramaCont = document.getElementById('cronograma-container');
+
+    if (reduccioActiva) {
+        // A) CÀLCULS PER A LES ANALOGIES (Basats en el període seleccionat per ser reactius)
+        const estalviAigua = tPeriode.aigua * 0.3 * 3;
+        const estalviElec = tPeriode.elec * 0.3 * 3;
+        const estalviCO2 = (tPeriode.elec * 0.25) * 0.3 * 3;
+        const estalviEcon = (tPeriode.ofi + tPeriode.neteja) * 0.3 * 3;
+
+        const banyeres = Math.round(estalviAigua / 150) || 0; 
+        const llars = Math.round(estalviElec / 250) || 0; 
+        const arbres = Math.round(estalviCO2 / 25) || 0; 
+        const portatils = Math.round(estalviEcon / 400) || 0;
+
+        if (estalviCont) {
+            estalviCont.innerHTML = `
+                <div class="pla-reduccio" style="margin-top:20px; border-left: 4px solid var(--eco-primary);">
+                    <h3 style="color:var(--eco-primary);">>_ IMPACTE QUANTIFICAT - 3 ANYS (${etiquetaPeriode.toUpperCase()}):</h3>
+                    <p style="font-size:0.75rem; color:var(--eco-soft); margin-bottom: 15px; opacity:0.8;">> Fes clic per veure les equivalències:</p>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <details class="analogy-details">
+                            <summary><span>♻️ Aigua: <b style="color:white">${estalviAigua.toLocaleString(undefined, {maximumFractionDigits:0})} L</b></span></summary>
+                            <div class="analogy-content">↳ Equival a omplir <b>${banyeres.toLocaleString()} banyeres</b>.</div>
+                        </details>
+                        <details class="analogy-details">
+                            <summary><span>⚡ Energia: <b style="color:white">${estalviElec.toLocaleString(undefined, {maximumFractionDigits:0})} kWh</b></span></summary>
+                            <div class="analogy-content">↳ Es mantindrien il·luminades <b>${llars.toLocaleString()} llars</b> un mes.</div>
+                        </details>
+                        <details class="analogy-details">
+                            <summary><span>🌍 CO2 Evitat: <b style="color:white">${estalviCO2.toLocaleString(undefined, {maximumFractionDigits:1})} kg</b></span></summary>
+                            <div class="analogy-content">↳ Feina d'absorció de <b>${arbres.toLocaleString()} arbres</b>/any.</div>
+                        </details>
+                        <details class="analogy-details">
+                            <summary><span>💶 Estalvi Econòmic: <b style="color:white">${estalviEcon.toLocaleString(undefined, {maximumFractionDigits:0})} €</b></span></summary>
+                            <div class="analogy-content">↳ Es finançarien <b>${portatils} portàtils</b> nous per a l'ITB.</div>
+                        </details>
+                    </div>
+                </div>
+            `;
+        }
+
+        // B) CRONOGRAMA DINÀMIC (Basat en l'estalvi global de tot l'any per ser realista)
+        if (cronogramaCont) {
+            cronogramaCont.innerHTML = `
+                <div class="pla-reduccio" style="margin-top: 30px;">
+                    <h3>> CRONOGRAMA D'ECONOMIA CIRCULAR (3 ANYS GLOBAL):</h3>
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-year">🗓️ ANY 1: Monitoratge (Objectiu: -10%)</div>
+                            <p>> <b>Acció:</b> Reparació de fuites nocturnes i Green Coding.</p>
+                            <p>> <b>Indicador:</b> Reducció de <b>${(tAny.aigua * 0.1).toLocaleString(undefined, {maximumFractionDigits:0})} L</b> i <b>${(tAny.elec * 0.1).toLocaleString(undefined, {maximumFractionDigits:0})} kWh</b>.</p>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-year">🗓️ ANY 2: Circularitat (Objectiu: -20%)</div>
+                            <p>> <b>Acció:</b> 'Zero Paper' i recondicionament d'equips RAEE.</p>
+                            <p>> <b>Indicador:</b> Estalvi de <b>${((tAny.ofi + tAny.neteja) * 0.2).toLocaleString(undefined, {maximumFractionDigits:2})} €</b> en consumibles.</p>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-year">🗓️ ANY 3: Autoconsum (Objectiu: -30%)</div>
+                            <p>> <b>Acció:</b> Ampliació planta solar i aprofitament hídric.</p>
+                            <p>> <b>Indicador:</b> S'evita l'emissió de <b>${(tAny.co2 * 0.3).toLocaleString(undefined, {maximumFractionDigits:1})} kg de CO2</b>.</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+    } else {
+        // Netejar contenidors si no hi ha reducció activa
+        if (estalviCont) estalviCont.innerHTML = "";
+        if (cronogramaCont) cronogramaCont.innerHTML = "";
     }
 
-    renderizarGraficos(t.elec * f, t.aigua * f, t.ofi * f, t.neteja * f);
-}
-
-function aplicarMillores() {
-    reduccioActiva = true;
-    calcular();
+    // Actualitzar els gràfics amb les dades del període seleccionat
+    renderizarGraficos(tPeriode.elec * f, tPeriode.aigua * f, tPeriode.ofi * f, tPeriode.neteja * f);
 }
 
 function renderizarGraficos(elec, aigua, ofi, neteja) {
